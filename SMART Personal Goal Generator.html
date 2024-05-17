@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Goal Generator</title>
+    <style>
+        body {
+            background-color: black;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid white;
+            border-radius: 10px;
+        }
+        h1 {
+            text-align: center;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            margin-top: 10px;
+        }
+        .description {
+            font-size: 0.9em;
+            color: #ccc;
+        }
+        textarea {
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid white;
+            border-radius: 5px;
+            background-color: black;
+            color: white;
+            height: 300px; /* Adjust height as needed */
+            overflow-y: auto;
+        }
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: white;
+            color: black;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #ddd;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>SMART Personal Goal Generator</h1>
+        <p>This program helps you create personal goals using the SMART methodology: Specific, Measurable, Achievable, Relevant, and Time-bound.</p>
+        <form id="goalForm">
+            <label for="specific">Specific:</label>
+            <span class="description">What exactly do you want to achieve?</span>
+            <textarea id="specific" name="specific" required></textarea>
+
+            <label for="measurable">Measurable:</label>
+            <span class="description">How will you measure your progress?</span>
+            <textarea id="measurable" name="measurable" required></textarea>
+
+            <label for="achievable">Achievable:</label>
+            <span class="description">How will you achieve your goal?</span>
+            <textarea id="achievable" name="achievable" required></textarea>
+
+            <label for="relevant">Relevant:</label>
+            <span class="description">Why is this goal important to you?</span>
+            <textarea id="relevant" name="relevant" required></textarea>
+
+            <label for="timebound">Time-bound:</label>
+            <span class="description">What is the deadline for achieving this goal?</span>
+            <textarea id="timebound" name="timebound" required></textarea>
+
+            <div class="buttons">
+                <button type="button" onclick="createNewFile()">Create New</button>
+                <button type="button" onclick="saveFile()">Save</button>
+                <button type="button" onclick="openFile()">Open</button>
+                <button type="button" onclick="printFile()">Print</button>
+                <button type="button" onclick="emailFile()">Email</button>
+            </div>
+        </form>
+    </div>
+    <script>
+        function createNewFile() {
+            document.getElementById('goalForm').reset();
+        }
+
+        function saveFile() {
+            const specific = document.getElementById('specific').value;
+            const measurable = document.getElementById('measurable').value;
+            const achievable = document.getElementById('achievable').value;
+            const relevant = document.getElementById('relevant').value;
+            const timebound = document.getElementById('timebound').value;
+
+            const goal = {
+                specific: specific,
+                measurable: measurable,
+                achievable: achievable,
+                relevant: relevant,
+                timebound: timebound
+            };
+
+            const blob = new Blob([JSON.stringify(goal, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'goal.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function openFile() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'application/json';
+            input.onchange = event => {
+                const file = event.target.files[0];
+                const reader = new FileReader();
+                reader.onload = e => {
+                    const goal = JSON.parse(e.target.result);
+                    document.getElementById('specific').value = goal.specific;
+                    document.getElementById('measurable').value = goal.measurable;
+                    document.getElementById('achievable').value = goal.achievable;
+                    document.getElementById('relevant').value = goal.relevant;
+                    document.getElementById('timebound').value = goal.timebound;
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
+        function printFile() {
+            const specific = document.getElementById('specific').value;
+            const measurable = document.getElementById('measurable').value;
+            const achievable = document.getElementById('achievable').value;
+            const relevant = document.getElementById('relevant').value;
+            const timebound = document.getElementById('timebound').value;
+
+            const printContent = `
+                Specific (What exactly do you want to achieve?): ${specific}
+                
+                Measurable (How will you measure your progress?): ${measurable}
+                
+                Achievable (How will you achieve your goal?): ${achievable}
+                
+                Relevant (Why is this goal important to you?): ${relevant}
+                
+                Time-bound (What is the deadline for achieving this goal?): ${timebound}
+            `;
+            
+            const newWindow = window.open('', '', 'width=600,height=400');
+            newWindow.document.write(`<pre>${printContent}</pre>`);
+            newWindow.document.close();
+            newWindow.print();
+        }
+
+        function emailFile() {
+            const specific = document.getElementById('specific').value;
+            const measurable = document.getElementById('measurable').value;
+            const achievable = document.getElementById('achievable').value;
+            const relevant = document.getElementById('relevant').value;
+            const timebound = document.getElementById('timebound').value;
+
+            const emailBody = `
+                Specific (What exactly do you want to achieve?): ${specific}\n
+                Measurable (How will you measure your progress?): ${measurable}\n
+                Achievable (How will you achieve your goal?): ${achievable}\n
+                Relevant (Why is this goal important to you?): ${relevant}\n
+                Time-bound (What is the deadline for achieving this goal?): ${timebound}
+            `;
+
+            window.location.href = `mailto:?subject=My SMART Goal&body=${encodeURIComponent(emailBody)}`;
+        }
+    </script>
+</body>
+</html>
